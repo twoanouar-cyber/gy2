@@ -197,6 +197,9 @@ class DatabaseService {
     this.db.run(`CREATE INDEX IF NOT EXISTS idx_subscribers_gym_status ON subscribers(gym_id, status)`);
     this.db.run(`CREATE INDEX IF NOT EXISTS idx_invoices_gym_date ON invoices(gym_id, created_at)`);
     this.db.run(`CREATE INDEX IF NOT EXISTS idx_purchases_gym_date ON purchases(gym_id, created_at)`);
+    this.db.run(`CREATE INDEX IF NOT EXISTS idx_internal_sales_gym_date ON internal_sales(gym_id, created_at)`);
+    this.db.run(`CREATE INDEX IF NOT EXISTS idx_subscription_types_gym ON subscription_types(gym_id, is_active)`);
+    this.db.run(`CREATE INDEX IF NOT EXISTS idx_subscribers_end_date ON subscribers(end_date, status)`);
   }
 
   async seedInitialData() {

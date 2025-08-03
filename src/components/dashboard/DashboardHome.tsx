@@ -76,6 +76,15 @@ const DashboardHome: React.FC = () => {
         AND strftime('%Y', created_at) = ?
       `, [gymId, selectedMonth.toString().padStart(2, '0'), selectedYear.toString()]);
 
+      // Get subscription revenue
+      const subscriptionRevenue = await window.electronAPI.query(`
+        SELECT COALESCE(SUM(price_paid), 0) as revenue
+        FROM subscribers 
+        WHERE gym_id = ? 
+        AND strftime('%m', created_at) = ? 
+        AND strftime('%Y', created_at) = ?
+      `, [gymId, selectedMonth.toString().padStart(2, '0'), selectedYear.toString()]);
+
       // Calculate monthly profit (simplified calculation)
       const profitData = await window.electronAPI.query(`
         SELECT 
@@ -88,13 +97,15 @@ const DashboardHome: React.FC = () => {
         AND strftime('%Y', i.created_at) = ?
       `, [gymId, selectedMonth.toString().padStart(2, '0'), selectedYear.toString()]);
 
+      const totalRevenue = (salesData[0]?.revenue || 0) + (subscriptionRevenue[0]?.revenue || 0);
+
       setStats({
         totalSubscribers: subscribersData[0]?.total || 0,
         activeSubscribers: subscribersData[0]?.active || 0,
         expiringSubscribers: subscribersData[0]?.expiring || 0,
         totalProducts: productsData[0]?.total || 0,
         lowStockProducts: productsData[0]?.low_stock || 0,
-        monthlyRevenue: salesData[0]?.revenue || 0,
+        monthlyRevenue: totalRevenue,
         totalSales: salesData[0]?.total_sales || 0,
         monthlyProfit: profitData[0]?.profit || 0
       });
